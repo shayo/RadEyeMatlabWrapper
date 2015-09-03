@@ -5,8 +5,8 @@ DiCarlo Lab @ MIT
 
 Revision History
 Version 0.1 9/1/2015, Initial code from Teledynedalsa imported
-                      Deinterlaced function re-implemented to remove the dependency on 32-bit
-					  Currently only supports 2048 x 1024 cameras (hard coded).
+Deinterlaced function re-implemented to remove the dependency on 32-bit
+Currently only supports 2048 x 1024 cameras (hard coded).
 */
 #include <stdio.h>
 #include "mex.h"
@@ -43,16 +43,16 @@ myImage::myImage()
 	frameCounter = -1;
 }
 
-	myImage::myImage(int width, int height, short *_imageData, unsigned long _frameCounter) : frameCounter(_frameCounter)
-	{
-		imageData = new short[width*height];
-		memcpy(imageData,_imageData, width*height*sizeof(short));
-	}
+myImage::myImage(int width, int height, short *_imageData, unsigned long _frameCounter) : frameCounter(_frameCounter)
+{
+	imageData = new short[width*height];
+	memcpy(imageData,_imageData, width*height*sizeof(short));
+}
 
-	myImage::~myImage()
-	{
-		delete imageData;
-	}
+myImage::~myImage()
+{
+	delete imageData;
+}
 
 
 
@@ -61,47 +61,51 @@ template<typename T, typename Container=std::deque<T> >
 class iterable_queue : public std::queue<T,Container>
 {
 public:
-    typedef typename Container::iterator iterator;
-    typedef typename Container::const_iterator const_iterator;
+	typedef typename Container::iterator iterator;
+	typedef typename Container::const_iterator const_iterator;
 
-    iterator begin() { return this->c.begin(); }
-    iterator end() { return this->c.end(); }
-    const_iterator begin() const { return this->c.begin(); }
-    const_iterator end() const { return this->c.end(); }
+	iterator begin() { return this->c.begin(); }
+	iterator end() { return this->c.end(); }
+	const_iterator begin() const { return this->c.begin(); }
+	const_iterator end() const { return this->c.end(); }
 };
 
 
 class RadEyeWrapper {
 public:
-		RadEyeWrapper();
-		~RadEyeWrapper();
-		bool isInitialized();
-		bool init();
-		int getWidth();
-		int getHeight();
-		void frameCallback(short *imageData);
-		int getNumImagesInBuffer();
+	RadEyeWrapper();
+	~RadEyeWrapper();
+	bool isInitialized();
+	bool init();
+	int getWidth();
+	int getHeight();
+	void frameCallback(short *imageData);
+	int getNumImagesInBuffer();
 
-		void setExposure(float value);
-		float getExposure();
-		int getBytesPerPixel();
-		void clearBuffer();
-		int getNumTrigs();
+	void setExposure(float value);
+	float getExposure();
+	int getBytesPerPixel();
+	void clearBuffer();
+	int getNumTrigs();
 
-		void setTrigger(bool state);
-		void resetTriggerCounter();
-		bool isThreadRunning();
+	void setTrigger(bool state);
+	void resetTriggerCounter();
+	bool isThreadRunning();
 	bool getImage();
 	bool isTriggeredEnabled();
 
 	int copyAndClearBuffer(unsigned char *imageBufferPtr, int N);
 
-void stopContinuousMode();
-void startContinuousMode(double framteRateHz);
-void grabSingleFrame(double exposureTimeMS);
+	void stopContinuousMode();
+	void startContinuousMode(double framteRateHz);
+	void grabSingleFrame(double exposureTimeMS);
 
-void generateSinglePulse();
+	void generateSinglePulse();
 	void threadTerminated();
+	void setExternalTrigger();
+
+	void startThread();
+	void stopThread();
 
 private:
 	void stoptInternalPulseGeneration();
@@ -110,9 +114,6 @@ private:
 	void startInternalPulseGeneration(bool periodic);
 	bool Init_iPORT();
 
-
-	void startThread();
-    void stopThread();
 
 	unsigned long numTrig;
 	bool triggerEnabled;
@@ -134,7 +135,7 @@ private:
 	unsigned long trigsSinceBufferRead;
 	iterable_queue<myImage*> imageQueue;
 	int imageFrameCounter;
-	
+
 	CyGrabber* m_cyGrabber;
 
 	short *m_lpFrameBase1;
@@ -144,7 +145,7 @@ private:
 	bool threadExittedNormally;
 	int pulseDelayMS;
 	bool inContinuousMode;
-		int threadTrigCounter,numImagesToCaptureBeforeThreadTerminate ;
+	int threadTrigCounter,numImagesToCaptureBeforeThreadTerminate ;
 };
 
 void RadEyeWrapper::threadTerminated()
@@ -164,7 +165,7 @@ void RadEyeWrapper::setTrigger(bool state)
 
 bool RadEyeWrapper::isTriggeredEnabled()
 {
-		return triggerEnabled;
+	return triggerEnabled;
 }
 
 bool RadEyeWrapper::isInitialized()
@@ -195,9 +196,9 @@ int RadEyeWrapper::getNumImagesInBuffer()
 void RadEyeWrapper::lockMutex()
 {
 	mutexCount++;
-       int dwWaitResult = WaitForSingleObject( 
-            ghMutex,    // handle to mutex
-            INFINITE);  // no time-out interval
+	int dwWaitResult = WaitForSingleObject( 
+		ghMutex,    // handle to mutex
+		INFINITE);  // no time-out interval
 }
 
 void RadEyeWrapper::unlockMutex()
@@ -217,7 +218,7 @@ void RadEyeWrapper::frameCallback(short *imageData)
 
 	myImage* pImage = new myImage(width, height, imageData,numTrig);
 	imageQueue.push(pImage);
-	
+
 	if (imageQueue.size() > maxImagesInBuffer)
 	{
 		myImage *p = imageQueue.front();
@@ -268,7 +269,7 @@ void RadEyeWrapper::release()
 		if (deviceOpened)
 		{
 			delete m_cyGrabber;
-				mexPrintf("OK!\n");
+			mexPrintf("OK!\n");
 		}
 
 		mexPrintf("Closing mutex...");
@@ -283,15 +284,15 @@ void RadEyeWrapper::release()
 /*
 void OnImageGrabbed(myImage* pImage, const void* pCallbackData)
 {
-	RadEyeWrapper *cls = (RadEyeWrapper*)pCallbackData;
-	if (cls->triggerEnabled) 
-	{
-		cls->lockMutex();
-		myImage *deepcopy = new myImage;
-		deepcopy->DeepCopy(pImage);
-		cls->frameCallback(deepcopy);
-		cls->unlockMutex();
-	}
+RadEyeWrapper *cls = (RadEyeWrapper*)pCallbackData;
+if (cls->triggerEnabled) 
+{
+cls->lockMutex();
+myImage *deepcopy = new myImage;
+deepcopy->DeepCopy(pImage);
+cls->frameCallback(deepcopy);
+cls->unlockMutex();
+}
 }
 */
 
@@ -407,27 +408,30 @@ bool RadEyeWrapper::Init_iPORT()
 
 void RadEyeWrapper::startInternalPulseGeneration(bool periodic)
 {
-		// Step 5: Program PLC to generate sync pulse for camera and set ctrl inputs high
+	// Step 5: Program PLC to generate sync pulse for camera and set ctrl inputs high
 	CyDevice& lDevice = m_cyGrabber->GetDevice();
 	if (!lDevice.HasExtension(CY_DEVICE_EXT_PULSE_GENERATOR))
 	{
 		// do something to process error...
 		return ;
 	}
+
 	CyDeviceExtension* lExtension = NULL;
 	lExtension = &lDevice.GetExtension(CY_DEVICE_EXT_PULSE_GENERATOR);
+
 	lExtension->SetParameter(CY_PULSE_GEN_PARAM_WIDTH, 10); // width (high) = 10ms
 	lExtension->SetParameter(CY_PULSE_GEN_PARAM_DELAY, pulseDelayMS); // delay (low) = 990ms (edit this as needed)
 	lExtension->SetParameter(CY_PULSE_GEN_PARAM_GRANULARITY, 33333); // granularity factor (x30ns)
 	lExtension->SetParameter(CY_PULSE_GEN_PARAM_PERIODIC, periodic); // emit periodic pulse
 	lExtension->SaveToDevice();
 
-	// Reverse enginerring by shay:
 
-	// The following sets up the communication between Pleora FPGA and Shadow-cam FPGA
-	// Pin configuration:
-	// 0 corresponds to the pulse generator OUTPUT pin (prrobably on Pleora)
-	// 4 corresponds to Frame valid pin on Shadow-cam FPGA (goes high whenever a frame acqusition starts).
+	// Look at Pleora PLC documentation
+	// Q0-A3 are going back to the IO cable.
+	// Q4-Q7 go to the camera.
+
+	// Inputs 0-3 are coming from the IO cable.
+	// Inputs 4-7 are coming from the camera.
 
 	// To set TTL_OUT0, use the Q0 register.
 	// For example, Q0 is linked to I7 (CY_GPIO_LUT_PARAM_INPUT_CONFIG7), which is set to pin 0 (pulse generator)
@@ -435,11 +439,13 @@ void RadEyeWrapper::startInternalPulseGeneration(bool periodic)
 	// For example, Q1 is linked to I2 (CY_GPIO_LUT_PARAM_INPUT_CONFIG2), which is set to pin 4 (frame valid)
 
 	// "Camera Frame Valid" (1/2.7*1000 = 370.37 ms).
-	
-	// Q4-Q6 registers are linked to camera controls pins (unknown function)
-	// Q7 register is connected to the FRAME_SYNC pin in the shadow-cam FPGA and is linked to pin 0 (i.e., the pulse generator).
+
+	// Q7 register is connected to the FRAME_SYNC pin in the shadow-cam FPGA and is linked 
+	// either to the internal pulse generator I7 ("0"), or to 
+
+	// Internal triggering
 	CyString lProgram = "Q0 = I7\r\nQ1 = I2\r\nQ4 = 1\r\nQ5 = 1\r\nQ6 = 1\r\nQ7 = I7\r\n";
-	
+
 	lExtension = &lDevice.GetExtension(CY_DEVICE_EXT_GPIO_LUT);
 	lExtension->SetParameter(CY_GPIO_LUT_PARAM_INPUT_CONFIG2, 4); // I2: camera frame valid
 	lExtension->SetParameter(CY_GPIO_LUT_PARAM_INPUT_CONFIG7, 0); // I7: pulse generator 0 output
@@ -449,9 +455,28 @@ void RadEyeWrapper::startInternalPulseGeneration(bool periodic)
 
 }
 
+
+
+void RadEyeWrapper::setExternalTrigger()
+{
+	// Step 5: Program PLC to generate sync pulse for camera and set ctrl inputs high
+	CyDevice& lDevice = m_cyGrabber->GetDevice();
+	CyDeviceExtension* lExtension = NULL;
+	CyString lProgram = "Q0 = I0\r\nQ1 = I2\r\nQ4 = 1\r\nQ5 = 1\r\nQ6 = 1\r\nQ7 = I0\r\n";
+
+	lExtension = &lDevice.GetExtension(CY_DEVICE_EXT_GPIO_LUT);
+	lExtension->SetParameter(CY_GPIO_LUT_PARAM_INPUT_CONFIG2, 4); // I2: camera frame valid
+	lExtension->SetParameter(CY_GPIO_LUT_PARAM_INPUT_CONFIG0, 0); // I7: pulse generator 0 output
+
+	lExtension->SetParameter(CY_GPIO_LUT_PARAM_GPIO_LUT_PROGRAM, lProgram);
+	lExtension->SaveToDevice();
+
+}
+
+
 void RadEyeWrapper::generateSinglePulse()
 {
-		CyDevice& lDevice = m_cyGrabber->GetDevice();
+	CyDevice& lDevice = m_cyGrabber->GetDevice();
 	if (!lDevice.HasExtension(CY_DEVICE_EXT_PULSE_GENERATOR))
 	{
 		// do something to process error...
@@ -495,7 +520,7 @@ bool RadEyeWrapper::init()
 		return false;
 
 	bytesPerPixel = 2; // 12 bit ADC
-	
+
 	width = 2048;
 	height = 1024;
 
@@ -503,16 +528,16 @@ bool RadEyeWrapper::init()
 	streaming = true;
 	initialized = true;
 	mexPrintf("Camera initialized and in capture mode\n");
-   return true;
+	return true;
 }
 
 RadEyeWrapper::RadEyeWrapper() : initialized(false), deviceOpened(false), streaming(false),triggered(false),numTrig(0)
 {
 	m_cyGrabber = NULL;
-    ghMutex = CreateMutex( 
-        NULL,              // default security attributes
-        FALSE,             // initially not owned
-        NULL);             // unnamed mutex
+	ghMutex = CreateMutex( 
+		NULL,              // default security attributes
+		FALSE,             // initially not owned
+		NULL);             // unnamed mutex
 	maxImagesInBuffer = 250; // ~ 1GB
 	triggerEnabled = true;
 	trigsSinceBufferRead = 0;
@@ -536,7 +561,7 @@ void RadEyeWrapper::myDeinterlace(short *I, int nCols, int nRows)
 	// 1, 513,  1025, 1537,  2,  514, 1026, 1538,...
 	// This needs to be reorganized like this:
 	// 1,2,3,....
-	
+
 
 	// first, make a lookup table, then map values accordingly...
 	int *map = new int[nCols];
@@ -558,7 +583,7 @@ void RadEyeWrapper::myDeinterlace(short *I, int nCols, int nRows)
 			deinterlaced[out_ind] = I[in_ind];
 		}
 	}
-	
+
 	memcpy(I,deinterlaced, nCols *nRows *sizeof(short));
 	delete deinterlaced;
 	delete map;
@@ -604,7 +629,8 @@ int RadEyeWrapper::copyAndClearBuffer(unsigned char *imageBufferPtr, int N){
 	unsigned short *imageBufferIntPtr = (unsigned short *)imageBufferPtr;
 	lockMutex();
 	int numCopied = 0;
-	
+
+
 	int numToCopy = MIN(imageQueue.size(),N);
 	int FirstImageTrig = (numToCopy > 0) ? (imageQueue.front())->frameCounter : -1;
 	unsigned short Pixel = 0;
@@ -613,19 +639,20 @@ int RadEyeWrapper::copyAndClearBuffer(unsigned char *imageBufferPtr, int N){
 		myImage *I = imageQueue.front();
 
 		unsigned short *data16bits = (unsigned short*) I->imageData;
-		long long offset = ((long long )width*(long long )height*k);
 
+		long long offset = ((long long )width*(long long )height*k);
+	
 		int counter = 0;
 		for (long y=0;y<height;y++)
 		{
 			for (long x=0;x<width;x++)
 			{
-	  			    imageBufferIntPtr[offset + (long long)((y)+x*(long)height)]=data16bits[counter];
-					counter++;
+				imageBufferIntPtr[offset + (long long)((y)+x*(long)height)]=data16bits[counter];
+				counter++;
 			}
 		}
 		
-		
+
 		imageQueue.pop();
 		delete I;
 	}
@@ -638,7 +665,7 @@ int RadEyeWrapper::copyAndClearBuffer(unsigned char *imageBufferPtr, int N){
 DWORD WINAPI thread_blocking_get_image(LPVOID lpParam)
 {
 	RadEyeWrapper *cls = (RadEyeWrapper*)lpParam;
-	
+
 	while (cls->isThreadRunning())
 	{
 
@@ -701,17 +728,17 @@ void RadEyeWrapper::startContinuousMode(double framteRateHz)
 
 void RadEyeWrapper::startThread()
 {
-	
-threadRunning = true;
-threadExittedNormally = false;
- threadHandle = CreateThread(
-			NULL,                   // default security attributes
-			0,                      // use default stack size  
-			thread_blocking_get_image,       // thread function name
-			this,          // argument to thread function 
-			0,                      // use default creation flags 
-			&threadID);   // returns the thread identifier 
-			
+
+	threadRunning = true;
+	threadExittedNormally = false;
+	threadHandle = CreateThread(
+		NULL,                   // default security attributes
+		0,                      // use default stack size  
+		thread_blocking_get_image,       // thread function name
+		this,          // argument to thread function 
+		0,                      // use default creation flags 
+		&threadID);   // returns the thread identifier 
+
 
 }
 RadEyeWrapper *camera=nullptr;
@@ -727,136 +754,146 @@ void mexFunction( int nlhs, mxArray *plhs[],
 				 int nrhs, const mxArray *prhs[] ) {
 
 
-if (nrhs == 0)
-	return;
- int StringLength = int(mxGetNumberOfElements(prhs[0])) + 1;
- char* Command = new char[StringLength];
- if (mxGetString(prhs[0], Command, StringLength) != 0){
-		mexErrMsgTxt("\nError extracting the command.\n");
-		return;
-} else if (strcmp(Command, "Init") == 0) {
-	 mexAtExit(exitFunction);
-	 if (camera != nullptr)
-		 delete camera;
+					 if (nrhs == 0)
+						 return;
+					 int StringLength = int(mxGetNumberOfElements(prhs[0])) + 1;
+					 char* Command = new char[StringLength];
+					 if (mxGetString(prhs[0], Command, StringLength) != 0){
+						 mexErrMsgTxt("\nError extracting the command.\n");
+						 return;
+					 } else if (strcmp(Command, "Init") == 0) {
+						 mexAtExit(exitFunction);
+						 if (camera != nullptr)
+							 delete camera;
 
-	camera = new RadEyeWrapper();
-	bool Success = camera->init();
-	 plhs[0] = mxCreateDoubleScalar(Success);
-	 delete Command;
+						 camera = new RadEyeWrapper();
+						 bool Success = camera->init();
+						 plhs[0] = mxCreateDoubleScalar(Success);
+						 delete Command;
 
-	 return;
- } 
- if (strcmp(Command, "IsInitialized") == 0) {
-	 if (camera==nullptr)
-		plhs[0] = mxCreateDoubleScalar(false);
-	 else
-		 plhs[0] = mxCreateDoubleScalar(camera->isInitialized());
-	 return;
- }
+						 return;
+					 } 
+					 if (strcmp(Command, "IsInitialized") == 0) {
+						 if (camera==nullptr)
+							 plhs[0] = mxCreateDoubleScalar(false);
+						 else
+							 plhs[0] = mxCreateDoubleScalar(camera->isInitialized());
+						 return;
+					 }
 
- if (camera == nullptr)
- {
-	 mexErrMsgTxt("You need to call Initialize first!.\n");
-	 delete Command;
-     plhs[0] = mxCreateDoubleScalar(0);
-	 return;
- }
+					 if (camera == nullptr)
+					 {
+						 mexErrMsgTxt("You need to call Initialize first!.\n");
+						 delete Command;
+						 plhs[0] = mxCreateDoubleScalar(0);
+						 return;
+					 }
 
- if (strcmp(Command, "Release") == 0) {
-	 if (camera != nullptr)
-	 {
-		 delete camera;
-		 camera = NULL;
-		 mexPrintf("Camera handles released.\n");
-	 }
-	  plhs[0] = mxCreateDoubleScalar(1);
- } 	else if (strcmp(Command,"GrabSingleFrame") == 0)
- {
-	double exposureTimeMS;
-	  if (nrhs > 1)
-		 exposureTimeMS = *(double*)mxGetPr(prhs[1]);
-	  else
-	  {
-		  mexPrintf("Please specify exposure time  (MS)\n");
-		  return;
-	  }
-	  camera->grabSingleFrame( exposureTimeMS);
- }
- 
- else if (strcmp(Command,"StartContinuous") == 0)
- {
-	 double framteRateHz;
-	  if (nrhs > 1) {
-		 framteRateHz = *(double*)mxGetPr(prhs[1]);
-		
-	  }
-	  else
-	  {
-		  mexPrintf("Please specify frame rate (Hz)\n");
-		  return;
-	  }
-	 camera->startContinuousMode( framteRateHz);
- }  else if (strcmp(Command,"GetBufferSize") == 0)
- {
-	 plhs[0] = mxCreateDoubleScalar(camera->getNumImagesInBuffer());
- }	else if (strcmp(Command,"StopContinuous") == 0)
- {
-	 camera->stopContinuousMode();
- }
-  else if (strcmp(Command,"GetImageBuffer") == 0) {
-	 int N = camera->getNumImagesInBuffer();
+					 if (strcmp(Command, "Release") == 0) {
+						 if (camera != nullptr)
+						 {
+							 delete camera;
+							 camera = NULL;
+							 mexPrintf("Camera handles released.\n");
+						 }
+						 plhs[0] = mxCreateDoubleScalar(1);
+					 } 	else if (strcmp(Command,"GrabSingleFrame") == 0)
+					 {
+						 double exposureTimeMS;
+						 if (nrhs > 1)
+							 exposureTimeMS = *(double*)mxGetPr(prhs[1]);
+						 else
+						 {
+							 mexPrintf("Please specify exposure time  (MS)\n");
+							 return;
+						 }
+						 camera->grabSingleFrame( exposureTimeMS);
+					 }
 
-	 if (nrhs > 1)
-	 {
-		 // grab a subset of images
-		int requestedNumberOfImages = (int)*(double*)mxGetPr(prhs[1]);
-		N = MIN(N, requestedNumberOfImages);
-	 }
+					 else if (strcmp(Command,"StartContinuous") == 0)
+					 {
+						 double framteRateHz;
+						 if (nrhs > 1) {
+							 framteRateHz = *(double*)mxGetPr(prhs[1]);
 
-	 int w = camera->getWidth();
-	 int h = camera->getHeight();
-	 mwSize dim[3] = {h,w,N};
-	 mxArray* imageBuffer =  mxCreateNumericArray(3, dim, mxUINT16_CLASS, mxREAL);
-	
-	 if (imageBuffer == nullptr)
-	 {
-		 mexPrintf("Error allocating memory for buffer.\n");
-	 }
+						 }
+						 else
+						 {
+							 mexPrintf("Please specify frame rate (Hz)\n");
+							 return;
+						 }
+						 camera->startContinuousMode( framteRateHz);
+					 }  else if (strcmp(Command,"GetBufferSize") == 0)
+					 {
+						 plhs[0] = mxCreateDoubleScalar(camera->getNumImagesInBuffer());
+					 }	else if (strcmp(Command,"StopContinuous") == 0)
+					 {
+						 camera->stopContinuousMode();
+					 } else if (strcmp(Command,"SetExternalTrigger") == 0)
+					 {
+						 camera->setExternalTrigger();
+					 } 
 
-	 unsigned char*imageBufferPtr = (unsigned char*)mxGetData(imageBuffer);
-	 
-	 plhs[0] = imageBuffer;
-     plhs[1] = mxCreateDoubleScalar(camera->copyAndClearBuffer(imageBufferPtr, N));
-  }
- else  if (strcmp(Command, "ClearBuffer") == 0)
- {
-	 camera->clearBuffer();
-	 plhs[0] = mxCreateDoubleScalar(1);
- }
- else  if (strcmp(Command, "ResetTriggerCounter") == 0)
- {
-	 camera->resetTriggerCounter();
-	 plhs[0] = mxCreateDoubleScalar(1);
- }
- else  if (strcmp(Command, "TriggerOFF") == 0)
- {
-	 camera->setTrigger(false);
-	 plhs[0] = mxCreateDoubleScalar(1);
- }
- else  if (strcmp(Command, "TriggerON") == 0)
- {
-	 camera->setTrigger(true);
-	 plhs[0] = mxCreateDoubleScalar(1);
- }
- else  if (strcmp(Command, "getNumTrigs") == 0)
- {
-	 plhs[0] = mxCreateDoubleScalar(camera->getNumTrigs());
- }
- 
- else {
-	 mexPrintf("Error. Unknown command\n");
- }
+					 else if (strcmp(Command,"GetImageBuffer") == 0) {
+						 int N = camera->getNumImagesInBuffer();
 
- delete Command;
+						 if (nrhs > 1)
+						 {
+							 // grab a subset of images
+							 int requestedNumberOfImages = (int)*(double*)mxGetPr(prhs[1]);
+							 N = MIN(N, requestedNumberOfImages);
+						 }
+
+						 int w = camera->getWidth();
+						 int h = camera->getHeight();
+						 mwSize dim[3] = {h,w,N};
+						 mxArray* imageBuffer =  mxCreateNumericArray(3, dim, mxUINT16_CLASS, mxREAL);
+
+						 if (imageBuffer == nullptr)
+						 {
+							 mexPrintf("Error allocating memory for buffer.\n");
+						 }
+
+						 unsigned char*imageBufferPtr = (unsigned char*)mxGetData(imageBuffer);
+
+						 plhs[0] = imageBuffer;
+						 plhs[1] = mxCreateDoubleScalar(camera->copyAndClearBuffer(imageBufferPtr, N));
+					 }
+					 else  if (strcmp(Command, "ClearBuffer") == 0)
+					 {
+						 camera->clearBuffer();
+						 plhs[0] = mxCreateDoubleScalar(1);
+					 }
+					 else  if (strcmp(Command, "ResetTriggerCounter") == 0)
+					 {
+						 camera->resetTriggerCounter();
+						 plhs[0] = mxCreateDoubleScalar(1);
+					 }
+					 else  if (strcmp(Command, "TriggerOFF") == 0)
+					 {
+						 camera->setTrigger(false);
+						 plhs[0] = mxCreateDoubleScalar(1);
+					 }
+					 else  if (strcmp(Command, "TriggerON") == 0)
+					 {
+						 camera->setTrigger(true);
+						 plhs[0] = mxCreateDoubleScalar(1);
+					 }
+					 else  if (strcmp(Command, "getNumTrigs") == 0)
+					 {
+						 plhs[0] = mxCreateDoubleScalar(camera->getNumTrigs());
+					 }  else  if (strcmp(Command, "StartThread") == 0)
+					 {
+						 camera->startThread();
+					 } else  if (strcmp(Command, "StopThread") == 0)
+					 {
+						 camera->stopThread();
+					 }
+
+					 else {
+						 mexPrintf("Error. Unknown command\n");
+					 }
+
+					 delete Command;
 
 }

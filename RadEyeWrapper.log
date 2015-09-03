@@ -1,0 +1,23 @@
+﻿Build started 9/3/2015 10:39:20 AM.
+     1>Project "C:\Users\shayo\Dropbox (MIT)\Code\Github\RadEyeMatlabWrapper\RadEyeWrapper.vcxproj" on node 2 (Rebuild target(s)).
+       Project file contains ToolsVersion="11.0". This toolset may be unknown or missing, in which case you may be able to resolve this by installing the appropriate version of MSBuild, or the build may have been forced to a particular ToolsVersion for policy reasons. Treating the project as if it had ToolsVersion="4.0". For more information, please see http://go.microsoft.com/fwlink/?LinkId=291333.
+     1>ClCompile:
+         C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\x86_amd64\CL.exe /c /IC:\MATLAB\R2014b_x64\\extern\include /I"C:\Program Files (x86)\Pleora Technologies Inc\eBUS-Vision Package\\Includes" /Zi /nologo /W3 /WX- /O2 /Ob1 /D MX_COMPAT_32 /D WIN32 /D NDEBUG /D _WINDOWS /D _USRDLL /D SELECTLABELS_EXPORTS /D _VC80_UPGRADE=0x0600 /D _WINDLL /D _MBCS /GF /Gm- /EHsc /MT /GS /Gy /fp:precise /Zc:wchar_t /Zc:forScope /Fo".\x64\Release\\" /Fd".\x64\Release\vc110.pdb" /Gd /TP /errorReport:prompt RadEyeWrapper.cpp
+         RadEyeWrapper.cpp
+     1>RadEyeWrapper.cpp(245): warning C4267: 'initializing' : conversion from 'size_t' to 'int', possible loss of data
+     1>RadEyeWrapper.cpp(600): warning C4101: 'nBytesWritten' : unreferenced local variable
+     1>RadEyeWrapper.cpp(634): warning C4267: 'initializing' : conversion from 'size_t' to 'int', possible loss of data
+     1>RadEyeWrapper.cpp(712): warning C4244: '=' : conversion from 'double' to 'int', possible loss of data
+     1>RadEyeWrapper.cpp(723): warning C4244: '=' : conversion from 'double' to 'int', possible loss of data
+     1>c:\users\shayo\dropbox (mit)\code\github\radeyematlabwrapper\radeyewrapper.cpp(623): warning C4715: 'RadEyeWrapper::getImage' : not all control paths return a value
+     1>C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\V110\Microsoft.CppBuild.targets(1137,5): warning MSB8012: TargetPath(C:\Users\shayo\Dropbox (MIT)\Code\Github\RadEyeMatlabWrapper\x64\Release\RadEyeWrapper.dll) does not match the Linker's OutputFile property value (C:\Users\shayo\Dropbox (MIT)\Code\Github\RadEyeMatlabWrapper\RadEyeWrapper.mexw64). This may cause your project to build incorrectly. To correct this, please make sure that $(OutDir), $(TargetName) and $(TargetExt) property values match the value specified in %(Link.OutputFile).
+     1>C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\V110\Microsoft.CppBuild.targets(1138,5): warning MSB8012: TargetExt(.dll) does not match the Linker's OutputFile property value (.mexw64). This may cause your project to build incorrectly. To correct this, please make sure that $(OutDir), $(TargetName) and $(TargetExt) property values match the value specified in %(Link.OutputFile).
+       Link:
+         C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\x86_amd64\link.exe /ERRORREPORT:PROMPT /OUT:"RadEyeWrapper.mexw64" /INCREMENTAL:NO /NOLOGO /LIBPATH:C:\MATLAB\R2014b_x64\\extern\lib\win64\microsoft /LIBPATH:"C:\Program Files (x86)\Pleora Technologies Inc\eBUS-Vision Package\\Libraries" odbc32.lib odbccp32.lib libmx.lib libmex.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /DEF:".\RadEyeWrapper.def" /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /PDB:".\x64\Release\fndllRadEyeWrapper.pdb" /TLBID:1 /DYNAMICBASE:NO /IMPLIB:"x64\Release\RadEyeWrapper.lib" /MACHINE:X64 /DLL .\x64\Release\RadEyeWrapper.obj
+            Creating library x64\Release\RadEyeWrapper.lib and object x64\Release\RadEyeWrapper.exp
+         RadEyeWrapper.vcxproj -> C:\Users\shayo\Dropbox (MIT)\Code\Github\RadEyeMatlabWrapper\x64\Release\RadEyeWrapper.dll
+     1>Done Building Project "C:\Users\shayo\Dropbox (MIT)\Code\Github\RadEyeMatlabWrapper\RadEyeWrapper.vcxproj" (Rebuild target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:00:04.62
